@@ -1,0 +1,5 @@
+# Abstract
+The objective of this project is to evaluate the smart beta strategy for recommending the best daily stocks to invest in. This strategy integrates information from technical indicators based on daily stock prices, as well as financial statement data on a quarterly and yearly basis. Each day, three stocks will be selected for purchase, with positions held for a three-month trading period.
+
+# Introduction
+The project aims to develop a smart beta strategy for stock selection, focusing on the integration of technical indicators and financial statement data. The strategy will be evaluated based on its performance in recommending daily stocks for investment, with a specific focus on the top three stocks to purchase each day. The positions will be held for a three-month trading period, allowing for a comprehensive assessment of the strategy's effectiveness.

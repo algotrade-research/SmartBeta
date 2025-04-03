@@ -30,6 +30,11 @@ def main():
         'PE': 0.1
     }
 
+    backtest = Backtesting(stock_data, financial_data, stock_score_params, quarterly_financial_score_params, yearly_financial_score_params, params.get('initial_balance'), params.get('transaction_fee'))
+    results = backtest.backtest(pd.Timestamp(params.get('in_sample_start_date')), pd.Timestamp('in_sample_end_date'), save_history=True)
+    with open('results/in_sample_initial_results.json', 'w') as f:
+        json.dump(results, f)
+
     with open("parameter/backtesting_params.json") as file:
         params = json.load(file)
 
