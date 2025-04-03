@@ -1,0 +1,14 @@
+{
+    "RSI": 0.2,
+    "MACD_histogram": -0.5,
+    "ROE": 0.5,
+    "Net Margin": 0.5,
+    "Debt to Equity": 0.5,
+    "Current Ratio": 0.5,
+    "Asset Turnover": 0.5,
+    "Revenue Growth": 0.5,
+    "Quick Ratio": 0.5,
+    "Inventory Turnover": 0.5,
+    "EPS": 0.1,
+    "PE": 0.1
+}

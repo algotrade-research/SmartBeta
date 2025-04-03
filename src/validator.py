@@ -11,7 +11,8 @@ def main():
     with open("parameter/backtesting_params.json") as file:
         backtest_params = json.load(file)
 
-    with open("parameter/init_params.json", "r", encoding="utf-8") as file:
+    # Load JSON file
+    with open("parameter/optimized_params.json", "r", encoding="utf-8") as file:
         weight_params = json.load(file)
 
     stock_score_params = {
@@ -27,6 +28,7 @@ def main():
         'Asset Turnover': weight_params['Asset Turnover'],
         'Revenue Growth': weight_params['Revenue Growth'],
         'Quick Ratio': weight_params['Quick Ratio'],
+        'Gross Margin': weight_params['Gross Margin'],
         'Inventory Turnover': weight_params['Inventory Turnover'],
     }
 
@@ -35,10 +37,16 @@ def main():
         'PE': weight_params['PE']
     }
 
+    # In Sample - Optimal Parameters
     backtest = Backtesting(stock_data, financial_data, stock_score_params, quarterly_financial_score_params, yearly_financial_score_params, backtest_params.get('initial_balance'), backtest_params.get('transaction_fee'))
+    results = backtest.backtest(pd.Timestamp(backtest_params.get('in_sample_start_date')), pd.Timestamp(backtest_params.get('in_sample_end_date')), save_history=True)
+    with open('results/in_sample_optimized_results.json', 'w') as f:
+        json.dump(results, f)
 
-    results = backtest.backtest(pd.Timestamp(backtest_params.get('in_sample_start_date')), pd.Timestamp(backtest_params.get('in_sample_end_date')))
-    with open('results/in_sample_initial_results.json', 'w') as f:
+    # Out sample
+    backtest = Backtesting(stock_data, financial_data, stock_score_params, quarterly_financial_score_params, yearly_financial_score_params, backtest_params.get('initial_balance'), backtest_params.get('transaction_fee'))
+    results = backtest.backtest(pd.Timestamp(backtest_params.get('out_sample_start_date')), pd.Timestamp(backtest_params.get('out_sample_end_date')))
+    with open('results/out_sample_optmized_results.json', 'w') as f:
         json.dump(results, f)
 
 

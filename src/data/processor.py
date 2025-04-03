@@ -159,7 +159,7 @@ class MarketDataProcessor:
         for ticker in self.vn_100_tickers:
             try:
                 # Try to read CSV first
-                data = pd.read_csv(f'./vn100/{ticker}.csv')
+                data = pd.read_csv(f'./data/vn100/{ticker}.csv')
                 data['tickersymbol'] = ticker
                 data = self.compute_technical_indicators(data)
             except FileNotFoundError:
@@ -169,8 +169,8 @@ class MarketDataProcessor:
                 data['tickersymbol'] = ticker
                 data = self.compute_technical_indicators(data)
                 # Save the generated data
-                os.makedirs('./vn100', exist_ok=True)
-                data.to_csv(f'./vn100/{ticker}.csv', index=False)
+                os.makedirs('./data/vn100', exist_ok=True)
+                data.to_csv(f'./data/vn100/{ticker}.csv', index=False)
             
             if stock_data is None:
                 stock_data = data
@@ -179,12 +179,12 @@ class MarketDataProcessor:
         
         # Load financial data
         try:
-            financial_data = pd.read_csv('./financial_report_data.csv')
+            financial_data = pd.read_csv('./data/financial_report_data.csv')
         except FileNotFoundError:
             # If financial data CSV not found, use StockDataLoader to get financial data
             print("Financial report data CSV not found. Generating using StockDataLoader...")
             financial_data = self.stock_data_processor.get_financial_statement_data()
-            financial_data.to_csv('./financial_report_data.csv', index=False)
+            financial_data.to_csv('./data/financial_report_data.csv', index=False)
         
         # Filter financial data for VN100 tickers
         financial_data = financial_data[financial_data['tickersymbol'].isin(self.vn_100_tickers)]
