@@ -4,6 +4,13 @@ This project evaluates the smart beta strategy for recommending daily stock inve
 # Introduction
 This project aims to develop and assess a smart beta strategy for stock selection in the VN100 market by combining technical indicators and financial statement data. The strategy is evaluated based on its ability to recommend the top three daily stocks for investment. Positions are maintained for a three-month trading period to ensure a comprehensive assessment of the strategy’s effectiveness.
 
+# Trading Hypotheses
+1. **Technical Indicators**: The strategy utilizes technical indicators derived from daily stock prices to identify potential buy signals. These indicators are expected to provide insights into short-term price movements and trends.
+2. **Financial Statement Data**: The strategy incorporates financial statement data on a quarterly and yearly basis to assess the fundamental strength of the selected stocks. This data is expected to provide a long-term perspective on the stocks' performance and stability.
+3. **Stock Selection**: The strategy selects the top three stocks based on a combination of technical indicators and financial statement data. This approach aims to balance short-term trading signals with long-term fundamental analysis.
+4. **Position Holding Period**: The strategy maintains positions for a three-month trading period. This duration is chosen to allow sufficient time for the selected stocks to realize their potential gains while minimizing the impact of short-term market fluctuations.
+5. **Performance Evaluation**: The strategy's performance is evaluated based on its ability to generate positive returns over the three-month holding period. Key performance metrics include annualized return, Sharpe ratio, and maximum drawdown.
+
 ## Installation
 1. Clone the repository:
 2. Navigate to the project directory and navigate to the `src` folder:
