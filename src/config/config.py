@@ -17,14 +17,14 @@ db_params = {
     "password": password,
 }
 
-backtesting_config = {}
-with open("parameter/backtesting_parameter.json", "r") as bf:
-    backtesting_config = json.load(bf)
+# backtesting_config = {}
+# with open("parameter/backtesting_parameter.json", "r") as bf:
+#     backtesting_config = json.load(bf)
 
-optimization_params = {}
-with open("parameter/optimization_parameter.json", "r") as of:
-    optimization_params = json.load(of)
+# optimization_params = {}
+# with open("parameter/optimization_parameter.json", "r") as of:
+#     optimization_params = json.load(of)
 
-optimized_params = {}
-with open("parameter/optimization_parameter.json", "r") as op:
-    optimized_params = json.load(op)
+# optimized_params = {}
+# with open("parameter/optimization_parameter.json", "r") as op:
+#     optimized_params = json.load(op)

@@ -36,9 +36,6 @@ class MarketDataProcessor:
             'VIC', 'VIX', 'VJC', 'VND', 'VNM', 'VPB', 'VPI', 'VRE', 'VTP'
         ]
 
-        # Initialize the stock data processor
-        self.stock_data_processor = StockDataLoader()
-
     def compute_technical_indicators(self, df):
         """
         Compute technical indicators for stock price data.
@@ -163,6 +160,8 @@ class MarketDataProcessor:
                 data['tickersymbol'] = ticker
                 data = self.compute_technical_indicators(data)
             except FileNotFoundError:
+                # Initialize the stock data processor
+                self.stock_data_processor = StockDataLoader()
                 # If CSV not found, use StockDataLoader to generate it
                 print(f"CSV for {ticker} not found. Generating using StockDataLoader...")
                 data = self.stock_data_processor.get_stock_price(ticker)
@@ -182,6 +181,8 @@ class MarketDataProcessor:
             financial_data = pd.read_csv('./data/financial_report_data.csv')
         except FileNotFoundError:
             # If financial data CSV not found, use StockDataLoader to get financial data
+            # Initialize the stock data processor
+            self.stock_data_processor = StockDataLoader()
             print("Financial report data CSV not found. Generating using StockDataLoader...")
             financial_data = self.stock_data_processor.get_financial_statement_data()
             financial_data.to_csv('./data/financial_report_data.csv', index=False)

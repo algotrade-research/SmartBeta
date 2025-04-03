@@ -126,7 +126,10 @@ class Backtesting:
         if shares <= 0:
             return False
         
+        # Calculate total cost including transaction fees
         total_cost = shares * price * (1 + self.transaction_cost)
+        transaction_fee = shares * price * self.transaction_cost
+        
         if total_cost > self.balance:
             return False
         
@@ -137,14 +140,18 @@ class Backtesting:
         if tickersymbol in self.portfolio:
             # Average down/up if we already have this stock
             existing_shares = self.portfolio[tickersymbol]['shares']
-            existing_cost = existing_shares * self.portfolio[tickersymbol]['buy_price']
+            existing_cost = self.portfolio[tickersymbol]['cost']  # Use stored cost instead of calculating
+            existing_base_cost = existing_shares * self.portfolio[tickersymbol]['buy_price']
+            
             total_shares = existing_shares + shares
-            avg_price = (existing_cost + (shares * price)) / total_shares
+            avg_price = (existing_base_cost + (shares * price)) / total_shares
+            total_cost_basis = existing_cost + total_cost
             
             self.portfolio[tickersymbol] = {
                 'shares': total_shares,
                 'buy_date': buy_date_str,
                 'buy_price': avg_price,
+                'cost': total_cost_basis,  # Total cost including all transactions and fees
                 'score': score,
                 'max_price': max(self.portfolio[tickersymbol]['max_price'], price),
                 'max_price_date': buy_date_str
@@ -154,6 +161,7 @@ class Backtesting:
                 'shares': shares,
                 'buy_date': buy_date_str,
                 'buy_price': price,
+                'cost': total_cost,  # Store total cost including fees
                 'score': score,
                 'max_price': price,
                 'max_price_date': buy_date_str
@@ -171,14 +179,19 @@ class Backtesting:
             return False
         
         shares = self.portfolio[tickersymbol]['shares']
-        sell_value = shares * price * (1 - self.transaction_cost)
+        gross_sell_value = shares * price
+        transaction_fee = gross_sell_value * self.transaction_cost
+        sell_value = gross_sell_value - transaction_fee
 
         # Convert buy_date and sell_date to strings
         buy_date = self.portfolio[tickersymbol]['buy_date']
         buy_date_str = buy_date.strftime("%Y-%m-%d %H:%M:%S") if isinstance(buy_date, datetime) else str(buy_date)
         sell_date_str = sell_datetime.strftime("%Y-%m-%d %H:%M:%S") if isinstance(sell_datetime, datetime) else str(sell_datetime)
 
-        # add to stock_pnl_history
+        # Get the total cost basis from the portfolio
+        cost_basis = self.portfolio[tickersymbol]['cost']
+        
+        # add to stock_pnl_history with more detailed cost information
         self.stock_pnl_history.append({
             'tickersymbol': tickersymbol,
             'score': self.portfolio[tickersymbol]['score'],
@@ -187,7 +200,14 @@ class Backtesting:
             'sell_date': sell_date_str,
             'sell_price': price,
             'shares': shares,
-            'pnl': sell_value - (shares * self.portfolio[tickersymbol]['buy_price'])
+            'cost': cost_basis,  # Total cost including all transactions and fees
+            'sell_value': sell_value,  # Net proceeds after fees
+            'gross_pnl': gross_sell_value - (shares * self.portfolio[tickersymbol]['buy_price']),  # Before fees
+            'net_pnl': sell_value - cost_basis,  # After all fees
+            'transaction_fees': {
+                'buy_fees': cost_basis - (shares * self.portfolio[tickersymbol]['buy_price']),
+                'sell_fees': transaction_fee
+            }
         })
         
         self.balance += sell_value
@@ -244,7 +264,7 @@ class Backtesting:
         """
         # Load VN-Index data
         try:
-            vn_index = pd.read_csv('./vn100/VNINDEX.csv')
+            vn_index = pd.read_csv('./data/vn100/VNINDEX.csv')
             vn_index['datetime'] = pd.to_datetime(vn_index['datetime'])
             
             # Filter to backtest period
@@ -565,7 +585,7 @@ class Backtesting:
         df['Date'] = pd.to_datetime(df['Date'])
 
         # Load VN-Index data for comparison
-        vn_index = pd.read_csv('./vn100/VNINDEX.csv')
+        vn_index = pd.read_csv('./data/vn100/VNINDEX.csv')
         vn_index['datetime'] = pd.to_datetime(vn_index['datetime'])
         vn_index = vn_index[vn_index['datetime'] >= df['Date'].min()]
         vn_index = vn_index[vn_index['datetime'] <= df['Date'].max()]

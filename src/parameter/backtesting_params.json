@@ -2,7 +2,7 @@
     "in_sample_start_date" : "2020-01-01",
     "in_sample_end_date" : "2023-12-31",
     "out_sample_start_date" : "2024-01-01",
-    "out_sameple_end_date" : "2024-12-31",
+    "out_sample_end_date" : "2025-01-01",
     "initial_balance": 3000000,
     "transaction_fee": 0.0035
 }
