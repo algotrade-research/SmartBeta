@@ -53,11 +53,11 @@ We calculate scores for each stock based on the technical indicators and financi
     - PE (Price to Earnings)
 
 # Backtesting
-To test the strategy, we will use the backtesting module
+- To test the strategy, we will use the backtesting module
 ```python
 python backtest.py
 ```
-You can change the setting in the `parameter/backtesting_params.json` file. The parameters are:
+- You can change the setting in the `parameter/backtesting_params.json` file. The parameters are:
 ```json
 {
     "in_sample_start_date" : "2020-01-01",
@@ -68,7 +68,23 @@ You can change the setting in the `parameter/backtesting_params.json` file. The 
     "transaction_fee": 0.0035
 }
 ```
-
+- The current initial weights for the scoring function are in `parameter/initial_params.json` file. The parameters are:
+```json
+{
+    "RSI": 0.2,
+    "MACD_histogram": -0.5,
+    "ROE": 0.5,
+    "Net Margin": 0.5,
+    "Debt to Equity": 0.5,
+    "Current Ratio": 0.5,
+    "Asset Turnover": 0.5,
+    "Revenue Growth": 0.5,
+    "Quick Ratio": 0.5,
+    "Inventory Turnover": 0.5,
+    "EPS": 0.1,
+    "PE": 0.1
+}
+```
 - Result:
 ![insample_init](./src/results/insample_init.png)
 
