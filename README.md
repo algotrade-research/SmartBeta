@@ -110,6 +110,9 @@ python optimizer.py
 # Out-of-sample Backtesting
 
 - To validate the performance of the optimized parameters, we will conduct an out-of-sample backtesting process. The out-of-sample backtesting process is done in the `validator.py` file.
+```bash
+python validator.py
+```
 - The results of the out-of-sample backtesting process will be stored in the `results` folder. 
 
 # Conclusion
