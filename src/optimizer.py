@@ -17,7 +17,7 @@ class ParameterOptimizer:
             with open(self.params_file, 'r') as f:
                 params = json.load(f)
             
-            self.start_date = pd.Timestamp(params.get('start_date', '2019-01-01'))
+            self.start_date = pd.Timestamp(params.get('start_date', '2020-01-01'))
             self.end_date = pd.Timestamp(params.get('end_date', '2023-12-31'))
             self.n_trials = params.get('n_trials', 100)
             self.initial_balance = params.get('initial_balance', 3000000)
