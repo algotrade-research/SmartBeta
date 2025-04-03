@@ -69,6 +69,11 @@ You can change the setting in the `parameter/backtesting_params.json` file. The 
 }
 ```
 
+- Result:
+![insample_init](./src/results/insample_init.png)
+
+- Report: [link](./doc/BACKTESTING_REPORT.pdf)
+
 # Optimization
 - Optuna is used for the optimization process. More detail of optuna can be found
 - We use the sum of sharpe ratio and maximum drawdown as the objective function to optimize. The optimization process is done in the `optimize.py` file. 
@@ -107,6 +112,11 @@ python optimizer.py
 }
 ```
 
+- Result:
+![insample_opt](./src/results/insample_optimized.png)
+
+- Report: [link](./doc/OPTIMIZATION_REPORT.pdf)
+
 # Out-of-sample Backtesting
 
 - To validate the performance of the optimized parameters, we will conduct an out-of-sample backtesting process. The out-of-sample backtesting process is done in the `validator.py` file.
@@ -114,6 +124,9 @@ python optimizer.py
 python validator.py
 ```
 - The results of the out-of-sample backtesting process will be stored in the `results` folder. 
+
+Result:
+![out_sample](./src/results/outsample_optimized.png)
 
 # Conclusion
 The smart beta strategy for stock selection has shown promising results in the VN100 market. The results of out-sample backtesting show significant results in the year 2024:
