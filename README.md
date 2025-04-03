@@ -1,8 +1,8 @@
 # Abstract
-The objective of this project is to evaluate the smart beta strategy for recommending the best daily stocks to invest in. This strategy integrates information from technical indicators based on daily stock prices, as well as financial statement data on a quarterly and yearly basis. Each day, three stocks will be selected for purchase, with positions held for a three-month trading period.
+This project evaluates the smart beta strategy for recommending daily stock investments. The strategy integrates technical indicators derived from daily stock prices and financial statement data on a quarterly and yearly basis. Each day, three stocks are selected for purchase, with positions held for a three-month trading period.
 
 # Introduction
-The project aims to develop a smart beta strategy for stock selection in the VN100 market, focusing on the integration of technical indicators and financial statement data. The strategy will be evaluated based on its performance in recommending daily stocks for investment, with a specific focus on the top three stocks to purchase each day. The positions will be held for a three-month trading period, allowing for a comprehensive assessment of the strategy's effectiveness. 
+This project aims to develop and assess a smart beta strategy for stock selection in the VN100 market by combining technical indicators and financial statement data. The strategy is evaluated based on its ability to recommend the top three daily stocks for investment. Positions are maintained for a three-month trading period to ensure a comprehensive assessment of the strategy’s effectiveness.
 
 ## Installation
 1. Clone the repository:
@@ -91,8 +91,8 @@ python backtest.py
 - Report: [link](./doc/BACKTESTING_REPORT.pdf)
 
 # Optimization
-- Optuna is used for the optimization process. More detail of optuna can be found
-- We use the sum of sharpe ratio and maximum drawdown as the objective function to optimize. The optimization process is done in the `optimize.py` file. 
+- Optuna is used for the optimization process. More detail of optuna can be found [here](https://optuna.org/)
+- The objective function maximizes the Sharpe ratio while minimizing maximum drawdown.
 - The setting for the optimization process is in the `parameter/optimization_params.json` file. The parameters are:
 ```json
 {
@@ -145,10 +145,14 @@ Result:
 ![out_sample](./src/results/outsample_optimized.png)
 
 # Conclusion
-The smart beta strategy for stock selection has shown promising results in the VN100 market. The results of out-sample backtesting show significant results in the year 2024:
-- The annual return is `24.18%`, compared to the benchmark VNINDEX with `12.03%`
-- The sharpe ratio is `0.84`, compared to the benchmark VNINDEX with `0.69`
+The smart beta strategy using technical indicators and financial statement data for stock selection has delivered promising results in the VN100 market. Out-of-sample backtesting for 2024 highlights its strong performance:
+
+- **Annual return**: 24.18%, outperforming the VNINDEX benchmark of 12.03%
+
+- **Sharpe ratio**: 0.84, compared to the VNINDEX benchmark of 0.69
+
+However, the current implementation does not fully replicate real trading conditions, as it does not account for slippage. Additionally, a more efficient allocation method should be explored instead of equally distributing investment across the top three selected stocks.
 
 # References
-- [1] Khoi Ta, "smart-beta", [Link](https://github.com/algotrade-research/smart-beta/)
-- [2] Algotrade. Weighting Methods Used in Smart-Beta Strategy. [Link](https://hub.algotrade.vn/knowledge-hub/weighting-methods-used-in-smart-beta-strategy/)
+- [1] Khoi Ta, *Smart Beta Strategy*, [Link](https://github.com/algotrade-research/smart-beta/)
+- [2] Algotrade. *Weighting Methods Used in Smart-Beta Strategy*. [Link](https://hub.algotrade.vn/knowledge-hub/weighting-methods-used-in-smart-beta-strategy/)
