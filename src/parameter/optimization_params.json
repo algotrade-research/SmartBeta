@@ -3,5 +3,5 @@
     "end_date" : "2023-12-31",
     "initial_balance" : 3000000,
     "transaction_fee" : 0.0035,
-    "n_trials" : 1000
+    "n_trials" : 100
 }

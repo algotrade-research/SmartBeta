@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import ta
 import os
+from sklearn.preprocessing import StandardScaler
+
 
 from data.loader import StockDataLoader  # Assuming the previous class is in this file
 
@@ -100,17 +102,6 @@ class MarketDataProcessor:
         
         # Handle RSI separately with backward fill
         df['RSI'] = df['RSI'].bfill()
-
-        from sklearn.preprocessing import StandardScaler
-
-        scaler = StandardScaler()
-
-        # Exclude "tickersymbol" and "datetime"
-        columns_to_exclude = ["tickersymbol", "datetime", "close"]
-        columns_to_scale = [col for col in df.columns if col not in columns_to_exclude]
-
-        # Apply scaling only to the selected columns
-        df[columns_to_scale] = scaler.fit_transform(df[columns_to_scale])
         
         return df
 
@@ -234,16 +225,18 @@ class MarketDataProcessor:
                 pe_ratio = stock_row['close'].iloc[0] / row['EPS']
                 financial_data.loc[index, 'PE'] = pe_ratio
 
-        from sklearn.preprocessing import StandardScaler
-
         scaler = StandardScaler()
 
         # Exclude "tickersymbol" and "datetime"
-        columns_to_exclude = ["tickersymbol", "year", "quarter"]
-        columns_to_scale = [col for col in financial_data.columns if col not in columns_to_exclude]
+        financial_columns_to_exclude = ["tickersymbol", "year", "quarter"]
+        financial_columns_to_scale = [col for col in financial_data.columns if col not in financial_columns_to_exclude]
+
+        stock_columns_to_exclude = ["tickersymbol", "datetime", "close"]
+        stock_columns_to_scale = [col for col in stock_data.columns if col not in stock_columns_to_exclude]
 
         # Apply scaling only to the selected columns
-        financial_data[columns_to_scale] = scaler.fit_transform(financial_data[columns_to_scale])
+        financial_data[financial_columns_to_scale] = scaler.fit_transform(financial_data[financial_columns_to_scale])
+        stock_data[stock_columns_to_scale] = scaler.fit_transform(stock_data[stock_columns_to_scale])
 
         return stock_data, financial_data
 

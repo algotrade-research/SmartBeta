@@ -50,7 +50,6 @@ class ParameterOptimizer:
         stock_score_params = {
             'RSI': trial.suggest_float('RSI', -1, 1),
             'MACD_histogram': trial.suggest_float('MACD_histogram', -1, 1),
-            # 'SMA_diff': trial.suggest_float('SMA_diff', 0, 2),
         }
 
         quarterly_financial_score_params = {
@@ -60,7 +59,6 @@ class ParameterOptimizer:
             'Current Ratio': trial.suggest_float('Current Ratio', 0, 1),
             'Asset Turnover': trial.suggest_float('Asset Turnover', 0, 1),
             'Revenue Growth': trial.suggest_float('Revenue Growth', 0, 1),
-            'Gross Margin': trial.suggest_float('Gross Margin', -1, 1),
             'Quick Ratio': trial.suggest_float('Quick Ratio', 0, 1),
             'Inventory Turnover': trial.suggest_float('Inventory Turnover', 0, 1),
         }
@@ -83,10 +81,9 @@ class ParameterOptimizer:
         results = backtest.backtest(
             self.start_date, 
             self.end_date, 
-            save_history=True
         )
 
-        return results['profit_loss'] / results['initial_value'] + results['sharpe_ratio'] + results['max_drawdown']
+        return results['sharpe_ratio'] + results['max_drawdown']
     
     def optimize(self):
         """Run the optimization process"""

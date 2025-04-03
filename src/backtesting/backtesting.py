@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime
+import numpy as np
 
 class Backtesting:
     def __init__(self, stock_data, financial_data, stock_score_params, quarterly_financial_score_params, yearly_financial_score_params, initial_balance=3000000, transaction_cost=0.0035):
@@ -228,7 +229,219 @@ class Backtesting:
         self.history.append(daily_status)
         return daily_status
 
-    def backtest(self, start_date, end_date, save_history=False, risk_free_rate=0.03/252):
+    
+    def calculate_benchmark_returns(self, start_date, end_date, initial_balance):
+        """
+        Calculate benchmark (VN-Index) returns for comparison with the strategy.
+        
+        Parameters:
+        - start_date: Start date for backtest period
+        - end_date: End date for backtest period
+        - initial_balance: Initial balance to simulate investment in the benchmark
+        
+        Returns:
+        - Dictionary containing benchmark performance data and daily returns
+        """
+        # Load VN-Index data
+        try:
+            vn_index = pd.read_csv('./vn100/VNINDEX.csv')
+            vn_index['datetime'] = pd.to_datetime(vn_index['datetime'])
+            
+            # Filter to backtest period
+            vn_index = vn_index[(vn_index['datetime'] >= start_date) & (vn_index['datetime'] <= end_date)]
+            vn_index = vn_index.sort_values('datetime')
+            
+            if len(vn_index) < 2:
+                return {'daily_returns': [], 'performance': None}
+            
+            # Calculate benchmark investment value (as if all money was invested in VN-Index)
+            initial_price = vn_index['close'].iloc[0]
+            vn_index['total_value'] = initial_balance * (vn_index['close'] / initial_price)
+            
+            # Calculate daily returns
+            vn_index['daily_return'] = vn_index['close'].pct_change()
+            
+            # Get daily returns as a list (starting from second day)
+            daily_returns = vn_index['daily_return'].iloc[1:].tolist()
+            
+            # Calculate benchmark performance
+            final_value = vn_index['total_value'].iloc[-1]
+            benchmark_performance = {
+                'initial_value': initial_balance,
+                'final_value': final_value,
+                'profit_loss': final_value - initial_balance,
+                'profit_loss_percent': ((final_value / initial_balance) - 1) * 100,
+            }
+            
+            return {
+                'daily_returns': daily_returns,
+                'performance': benchmark_performance,
+                'data': vn_index
+            }
+        
+        except Exception as e:
+            print(f"Error calculating benchmark returns: {e}")
+            return {'daily_returns': [], 'performance': None}
+    
+    def calculate_metrics(self, initial_balance, total_final_value, history, stock_pnl_history, risk_free_rate=0.03/252, benchmark_returns=None):
+        """
+        Calculate performance metrics for the trading strategy.
+        
+        Parameters:
+        - initial_balance: Starting balance
+        - total_final_value: Ending balance including cash and portfolio value
+        - history: List of daily status records
+        - stock_pnl_history: History of stock transactions and P&L
+        - risk_free_rate: Daily risk-free rate (default: 3% annual / 252 trading days)
+        - benchmark_returns: List of benchmark daily returns for Information Ratio calculation
+        
+        Returns:
+        - Dictionary containing all calculated metrics
+        """
+        metrics = {}
+        
+        # HPR (Holding Period Return)
+        metrics['hpr'] = total_final_value / initial_balance - 1
+
+        # Calculate strategy daily returns for use in various metrics
+        daily_returns = []
+        if len(history) > 1:
+            # Extract daily returns, skipping the first day which has no return
+            daily_returns = [record['daily_return'] for record in history if record['daily_return'] is not None]
+
+        # Annualized HPR
+        if len(history) > 1:
+            years = len(history) / 252  # Assuming 252 trading days per year
+            metrics['annualized_hpr'] = (1 + metrics['hpr']) ** (1 / years) - 1
+        else:
+            metrics['annualized_hpr'] = None
+
+        # Excess HPR (over risk-free rate for the holding period)
+        metrics['excess_hpr'] = None
+        if len(history) > 1:
+            # Calculate cumulative risk-free return for the holding period
+            holding_period_days = len(history)
+            cumulative_risk_free = (1 + risk_free_rate) ** holding_period_days - 1
+            metrics['excess_hpr'] = metrics['hpr'] - cumulative_risk_free
+
+        # Annual Return
+        metrics['annual_return'] = None
+        if metrics['annualized_hpr'] is not None:
+            metrics['annual_return'] = metrics['annualized_hpr'] * 100
+
+        # Annual Excess Return (over risk-free rate)
+        metrics['annual_excess_return'] = None
+        if metrics['annual_return'] is not None:
+            annual_risk_free = (1 + risk_free_rate) ** 252 - 1
+            metrics['annual_excess_return'] = metrics['annual_return'] - (annual_risk_free * 100)
+        
+        # Calculate average daily return and standard deviation
+        avg_return = np.mean(daily_returns) if daily_returns else None
+        std_return = np.std(daily_returns) if daily_returns else None
+        
+        # Sharpe Ratio
+        metrics['sharpe_ratio'] = None
+        if avg_return is not None and std_return is not None and std_return > 0:
+            daily_sharpe = (avg_return - risk_free_rate) / std_return
+            metrics['sharpe_ratio'] = daily_sharpe * np.sqrt(252)  # Annualize
+        
+        # Sortino Ratio (using only negative returns for denominator)
+        metrics['sortino_ratio'] = None
+        if avg_return is not None:
+            # Extract only negative returns
+            negative_returns = [r for r in daily_returns if r < 0]
+            
+            if negative_returns:
+                # Calculate downside deviation (standard deviation of negative returns)
+                downside_deviation = np.std(negative_returns)
+                
+                if downside_deviation > 0:
+                    # Calculate annualized Sortino ratio
+                    daily_sortino = (avg_return - risk_free_rate) / downside_deviation
+                    metrics['sortino_ratio'] = daily_sortino * np.sqrt(252)  # Annualize
+        
+        # Information Ratio (excess return over benchmark / tracking error)
+        metrics['information_ratio'] = None
+        if benchmark_returns and len(daily_returns) > 0:
+            # Ensure we're comparing the same number of days
+            min_length = min(len(daily_returns), len(benchmark_returns))
+            strategy_returns = daily_returns[:min_length]
+            benchmark_returns = benchmark_returns[:min_length]
+            
+            # Calculate excess returns over benchmark
+            excess_returns = [s - b for s, b in zip(strategy_returns, benchmark_returns)]
+            
+            # Calculate tracking error (standard deviation of excess returns)
+            tracking_error = np.std(excess_returns)
+            
+            if tracking_error > 0:
+                # Calculate Information Ratio
+                avg_excess_return = np.mean(excess_returns)
+                metrics['information_ratio'] = avg_excess_return / tracking_error * np.sqrt(252)  # Annualize
+            
+            # Calculate Beta (measure of volatility/systematic risk compared to the market)
+            cov_matrix = np.cov(strategy_returns, benchmark_returns)
+            if len(cov_matrix) > 1 and cov_matrix[1, 1] != 0:
+                metrics['beta'] = cov_matrix[0, 1] / cov_matrix[1, 1]
+            else:
+                metrics['beta'] = None
+            
+            # Calculate Alpha (excess return over what would be predicted by CAPM)
+            if metrics['beta'] is not None:
+                avg_benchmark_return = np.mean(benchmark_returns)
+                expected_return = risk_free_rate + metrics['beta'] * (avg_benchmark_return - risk_free_rate)
+                metrics['alpha'] = (avg_return - expected_return) * 252  # Annualized
+            else:
+                metrics['alpha'] = None
+        
+        # Max drawdown
+        metrics['max_drawdown'] = 0
+        if history:
+            max_value = initial_balance
+            max_drawdown = 0
+            for record in history:
+                total_value = record['total_value']
+                max_value = max(max_value, total_value)
+                drawdown = (total_value - max_value) / max_value
+                max_drawdown = min(max_drawdown, drawdown)
+            metrics['max_drawdown'] = max_drawdown
+        
+        # Longest Drawdown (in days)
+        metrics['longest_drawdown'] = 0
+        if history:
+            max_value = initial_balance
+            current_drawdown_days = 0
+            longest_drawdown = 0
+            
+            for record in history:
+                total_value = record['total_value']
+                
+                if total_value >= max_value:
+                    # New high, reset drawdown counter
+                    max_value = total_value
+                    current_drawdown_days = 0
+                else:
+                    # In drawdown
+                    current_drawdown_days += 1
+                    longest_drawdown = max(longest_drawdown, current_drawdown_days)
+            
+            metrics['longest_drawdown'] = longest_drawdown
+        
+        # Turnover Ratio (total dollar amount of trades / average portfolio value)
+        metrics['turnover_ratio'] = None
+        if history and stock_pnl_history:
+            # Calculate total dollar amount of trades
+            total_trades_value = sum([abs(trade['cost']) for trade in stock_pnl_history])
+            
+            # Calculate average portfolio value
+            if len(history) > 0:
+                avg_portfolio_value = np.mean([record['total_value'] for record in history])
+                if avg_portfolio_value > 0:
+                    metrics['turnover_ratio'] = total_trades_value / avg_portfolio_value
+        
+        return metrics
+
+    def backtest(self, start_date, end_date, save_history=True, risk_free_rate=0.03/252):
         # Pre-calculate trading days and unique tickers for faster processing
         trading_days = sorted(self.stock_data[
             (self.stock_data['datetime'] >= start_date) &
@@ -246,6 +459,14 @@ class Backtesting:
             initial_balance = initial_status['balance']
         else:
             initial_balance = self.balance
+
+        # Calculate benchmark returns for comparison
+        benchmark_data = self.calculate_benchmark_returns(
+            start_date, 
+            end_date, 
+            initial_balance
+        )
+        benchmark_returns = benchmark_data['daily_returns']
         
         for current_date in trading_days:
             # Check for stocks to sell (bought 3 months ago)
@@ -298,41 +519,29 @@ class Backtesting:
         final_portfolio_value = self.calculate_portfolio_value(trading_days[-1])
         total_final_value = self.balance + final_portfolio_value
 
-        # Calculate Sharpe ratio if we have history
-        sharpe_ratio = None
-        if save_history and len(self.history) > 1:
-            # Extract daily returns, skipping the first day which has no return
-            daily_returns = [record['daily_return'] for record in self.history if record['daily_return'] is not None]
-            
-            if daily_returns:
-                # Calculate average daily return and standard deviation
-                avg_return = np.mean(daily_returns)
-                std_return = np.std(daily_returns)
-                
-                # Calculate annualized Sharpe ratio (assuming 252 trading days per year)
-                if std_return > 0:
-                    daily_sharpe = (avg_return - risk_free_rate) / std_return
-                    sharpe_ratio = daily_sharpe * np.sqrt(252)  # Annualize
+        # Calculate performance metrics
+        metrics = self.calculate_metrics(
+            initial_balance, 
+            total_final_value, 
+            self.history, 
+            self.stock_pnl_history,
+            risk_free_rate,
+            benchmark_returns
+        )
         
-        # Calculate max drawdown
-        max_value = initial_balance
-        max_drawdown = 0
-        for record in self.history:
-            total_value = record['total_value']
-            max_value = max(max_value, total_value)
-            drawdown = (total_value - max_value) / max_value
-            max_drawdown = min(max_drawdown, drawdown)
-        
-        return {
+        # Add base values to results
+        results = {
             'initial_value': initial_balance,
             'final_value': total_final_value,
-            'profit_loss': total_final_value - initial_balance,
-            'profit_loss_percent': ((total_final_value / initial_balance) - 1) * 100,
-            'sharpe_ratio': sharpe_ratio,
-            'max_drawdown': max_drawdown,
+            'metrics' : metrics,
             'history': self.history,
             'stock_pnl_history': self.stock_pnl_history
         }
+        
+        # # Add calculated metrics to results
+        # results.update(metrics)
+        
+        return results
 
     def plot_performance(self):        
         if not self.history:
@@ -371,8 +580,6 @@ class Backtesting:
         # plt.plot(df['Date'], df['Cash Balance'], label='Cash Balance')
 
         plt.plot(vn_index['datetime'], vn_index['Total Value'], label='VN-Index', linestyle='--', color='orange')
-
-
         
         plt.title('Backtest Performance')
         plt.xlabel('Date')

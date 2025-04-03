@@ -149,17 +149,6 @@ class StockDataLoader:
         
         :return: Pivoted financial data DataFrame
         """
-        # Financial report fields query
-        financial_report_fields_query = """
-        select distinct info.code, item.name
-        from financial.info info join financial.item item on info.code = item.code
-        order by info.code
-        """
-
-        financial_report_fields = pd.DataFrame(
-            self.execute_query(financial_report_fields_query), 
-            columns=["code", "name"]
-        )
 
         # Financial report data query
         financial_report_data_query = """

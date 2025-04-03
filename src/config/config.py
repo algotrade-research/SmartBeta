@@ -24,3 +24,7 @@ with open("parameter/backtesting_parameter.json", "r") as bf:
 optimization_params = {}
 with open("parameter/optimization_parameter.json", "r") as of:
     optimization_params = json.load(of)
+
+optimized_params = {}
+with open("parameter/optimization_parameter.json", "r") as op:
+    optimized_params = json.load(op)
