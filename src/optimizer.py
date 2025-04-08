@@ -7,7 +7,7 @@ from backtesting.backtesting import Backtesting
 from data.processor import MarketDataProcessor
 
 class ParameterOptimizer:
-    def __init__(self, params_file="parameters/optimization_params.json"):
+    def __init__(self, params_file="parameter/optimization_params.json"):
         self.params_file = params_file
         self.load_params()
         self.stock_data, self.financial_data = self.load_data()
@@ -85,7 +85,9 @@ class ParameterOptimizer:
             self.end_date, 
         )
 
-        return results['sharpe_ratio'] + results['max_drawdown']
+        metrics = results['metrics']
+
+        return metrics['sharpe_ratio'] + metrics['max_drawdown']
     
     def optimize(self):
         """Run the optimization process"""
