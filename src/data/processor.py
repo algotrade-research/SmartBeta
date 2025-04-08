@@ -133,9 +133,9 @@ class MarketDataProcessor:
             'Interest Coverage Ratio': df['Operating Profit'] / df['Financial Expenses'],
             'Equity Multiplier': df['Total Assets'] / (df['Shareholders Equity'] + df['Owners Equity']),
             'Fixed Asset Turnover': df['Net Revenue'] / df['Fixed Assets'],
-            'Revenue Growth': df['Net Revenue'].pct_change(),
-            'Asset Growth': df['Total Assets'].pct_change(),
-            'Net Income Growth': df['Net Profit After Tax'].pct_change(),
+            'Revenue Growth': df['Net Revenue'].pct_change(fill_method=None).fillna(0),
+            'Asset Growth': df['Total Assets'].pct_change(fill_method=None).fillna(0),
+            'Net Income Growth': df['Net Profit After Tax'].pct_change(fill_method=None).fillna(0),
             'EPS': df['EPS']
         }
         
