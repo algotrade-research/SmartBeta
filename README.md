@@ -26,15 +26,20 @@ pip install -r requirements.txt
 # Data
 ## Data Collection
 There are two types of data which are the financial statement and daily trading data. The data is collected from the `loader.py` file if the data is not available.
+## Data Source
+- You can get the stock data and financial statement data [here](https://drive.google.com/file/d/1t7Kv9zTggAkNcku5FuJPxpt8R2d65Iv7/view?usp=sharing)
+- Unzip and paste them in the `data` folder. 
+- **I encourage you to download the data from the link above and use it for your own analysis. Since getting data from the loader.py file is 30 minutes long.**
 ## Database Environment
+- If you want the latest data from the loader.py file, you need to have a database environment.
 - In order to run the project, you need to have a database environment. 
 - Create ```.env``` file and enter your data source configuration with the format
 ```
 HOST=<host or ip>
 PORT=<port>
 DATABASE=<database name>
-USER=<username>
-PASSWORD=<password>
+DB_USER=<username>
+DB_PASSWORD=<password>
 ```
 - source the .env file by the command:
 ```
@@ -104,6 +109,7 @@ python backtest.py
 # Optimization
 - Optuna is used for the optimization process. More detail of optuna can be found [here](https://optuna.org/)
 - The objective function maximizes the Sharpe ratio while minimizing maximum drawdown.
+- The optimization speed is about 3 trials per minute, so the default 100 trials will take about 30 minutes. You can change the number of trials in the `parameter/optimization_params.json` file.
 - The setting for the optimization process is in the `parameter/optimization_params.json` file. The parameters are:
 ```json
 {
