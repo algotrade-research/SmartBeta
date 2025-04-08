@@ -6,8 +6,8 @@ load_dotenv()
 host = os.getenv("HOST")
 port = os.getenv("PORT")
 database = os.getenv("DATABASE")
-user = os.getenv("USER")
-password = os.getenv("PASSWORD")
+user = os.getenv("DB_USER")
+password = os.getenv("DB_PASSWORD")
 
 db_params = {
     "host": host,

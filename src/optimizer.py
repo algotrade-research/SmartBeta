@@ -4,6 +4,7 @@ import pandas as pd
 import os
 
 from backtesting.backtesting import Backtesting
+from data.processor import MarketDataProcessor
 
 class ParameterOptimizer:
     def __init__(self, params_file="parameters/optimization_params.json"):
@@ -41,9 +42,10 @@ class ParameterOptimizer:
     
     def load_data(self):
         """Load stock and financial data"""
-        # Implementation would depend on your data source
-        # This is a placeholder for the data loading function
-        return None, None  # Replace with actual data loading
+        processor = MarketDataProcessor()
+
+        stock_data, financial_data = processor.load_data()
+        return stock_data, financial_data
     
     def objective(self, trial):
         """Objective function for Optuna optimization"""

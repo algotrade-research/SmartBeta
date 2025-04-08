@@ -11,7 +11,7 @@ def main():
     with open("parameter/backtesting_params.json") as file:
         backtest_params = json.load(file)
 
-    with open("parameter/init_params.json", "r", encoding="utf-8") as file:
+    with open("parameter/initial_params.json", "r", encoding="utf-8") as file:
         weight_params = json.load(file)
 
     stock_score_params = {

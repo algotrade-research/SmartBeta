@@ -166,10 +166,12 @@ class MarketDataProcessor:
                 print(f"CSV for {ticker} not found. Generating using StockDataLoader...")
                 data = self.stock_data_processor.get_stock_price(ticker)
                 data['tickersymbol'] = ticker
-                data = self.compute_technical_indicators(data)
                 # Save the generated data
                 os.makedirs('./data/vn100', exist_ok=True)
                 data.to_csv(f'./data/vn100/{ticker}.csv', index=False)
+                data = pd.read_csv(f'./data/vn100/{ticker}.csv')
+                data['tickersymbol'] = ticker
+                data = self.compute_technical_indicators(data)
             
             if stock_data is None:
                 stock_data = data
