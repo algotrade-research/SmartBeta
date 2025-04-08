@@ -6,8 +6,12 @@ This project aims to develop and assess a smart beta strategy for stock selectio
 
 ## Installation
 1. Clone the repository:
-2. Navigate to the project directory and navigate to the `src` folder:
-3. Install the required packages:
+2. Navigate to the project directory 
+3. Navigate to the `src` directory:
+```bash
+cd src/
+```
+4. Install the required packages:
 ```bash
 pip install -r requirements.txt
 ```
