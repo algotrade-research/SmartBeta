@@ -41,12 +41,16 @@ def main():
     results = backtest.backtest(pd.Timestamp(backtest_params.get('in_sample_start_date')), pd.Timestamp(backtest_params.get('in_sample_end_date')), save_history=True)
     with open('results/in_sample_optimized_results.json', 'w') as f:
         json.dump(results, f)
+    
+    backtest.plot_performance(title='In-Sample Optimized Parameters', save_path='results/insample_optimized.png')
 
     # Out sample
     backtest = Backtesting(stock_data, financial_data, stock_score_params, quarterly_financial_score_params, yearly_financial_score_params, backtest_params.get('initial_balance'), backtest_params.get('transaction_fee'))
     results = backtest.backtest(pd.Timestamp(backtest_params.get('out_sample_start_date')), pd.Timestamp(backtest_params.get('out_sample_end_date')), save_history=True)
     with open('results/out_sample_optimized_results.json', 'w') as f:
         json.dump(results, f)
+    
+    backtest.plot_performance(title='Out-Sample Optimized Parameters', save_path='results/outsample_optimized.png')
 
 
 if __name__ == "__main__":

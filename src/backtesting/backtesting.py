@@ -563,7 +563,7 @@ class Backtesting:
         
         return results
 
-    def plot_performance(self):        
+    def plot_performance(self, title='Backtest Performance', save_path=None):        
         if not self.history:
             print("No backtest history to plot")
             return
@@ -601,12 +601,18 @@ class Backtesting:
 
         plt.plot(vn_index['datetime'], vn_index['Total Value'], label='VN-Index', linestyle='--', color='orange')
         
-        plt.title('Backtest Performance')
+        plt.title(title)
         plt.xlabel('Date')
         plt.ylabel('Value ($)')
         plt.legend()
         plt.grid(True)
         plt.tight_layout()
-        plt.show()
+        
+        if save_path:
+            plt.savefig(save_path)
+            print(f"Plot saved to {save_path}")
+        else:
+            plt.show()
+        plt.close()
         
         return df

@@ -41,6 +41,12 @@ def main():
     with open('results/in_sample_initial_results.json', 'w') as f:
         json.dump(results, f)
 
+    backtest.plot_performance(title='In-Sample Initial Parameters', save_path='results/insample_init.png')
+
+    print('In-sample results saved to results/in_sample_initial_results.json')
+    print('Metrics:')
+    print(results['metrics'])
+
 
 if __name__ == "__main__":
     main()
