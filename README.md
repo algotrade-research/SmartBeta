@@ -1,4 +1,5 @@
 ![Static Badge](https://img.shields.io/badge/PLUTUS-70%25-darkgreen)
+![Static Badge](https://img.shields.io/badge/PLUTUS-Sample-darkblue)
 
 # Abstract
 This project evaluates the smart beta strategy for recommending daily stock investments. The strategy integrates technical indicators derived from daily stock prices and financial statement data on a quarterly and yearly basis. Each day, three stocks are selected for purchase, with positions held for a three-month trading period.
